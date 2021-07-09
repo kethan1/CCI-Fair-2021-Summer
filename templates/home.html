@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCR Document Scanner</title>
+    <script src='https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js'></script>
+    <script src="/static/glfx.js"></script>
+</head>
+<body>
+    <div class="container" style="text-align: center;">
+        <h3>OCR Document Scanner</h3>
+        <p>Take Image From Camera:</p>
+        <div style="text-align: center;">
+            <video id="video" width="480" height="360" autoplay></video>
+            <br>
+            <br>
+            <button id="snap" class="btn waves-effect waves-light">Crop and Clean Up Image</button>
+        </div>
+        <p>Or Upload File:</p>
+        <div class="row">
+            <div class="file-field input-field">
+                <div class="btn">
+                    <span>File</span>
+                    <input type="file">
+                </div>
+                <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text">
+                </div>
+            </div>
+            <!-- <a onclick="getTextFromFile()" class="waves-effect waves-light btn">Get Text From Image</a> -->
+        </div>
+        <br>
+        <div>
+            <div class="progress" style="visibility: hidden;">
+                <div class="determinate" style="width: 0%;"></div>
+            </div>
+            <p id="current_action"></p>
+        </div>
+        
+        <div id="changeCanvas">
+
+        </div>
+        <h4 style="text-align: center;">
+            Output Text:
+            <div id="outputText"></div>
+        </h4>
+    </div>
+    
+    <script>
+        function getTextFromFile() {
+            if (document.querySelector('input[type=file]').files.length > 0) {
+                const file = document.querySelector('input[type=file]').files[0];
+                const reader = new FileReader();
+
+                if (file) {
+                    reader.readAsDataURL(file);
+                }
+
+                reader.addEventListener("load", function () {
+
+                    // convert image file to base64 string
+                    Tesseract.recognize(
+                        reader.result,
+                        'eng',
+                        {
+                            logger: m => {
+                                console.log(m)
+                                if (m.status === "recognizing text") {
+                                    if (!(m.progress === 1)) {
+                                        document.querySelector(".progress").style.visibility = 'visible';
+                                        document.querySelector(".determinate").style.width = String(m.progress * 100) + "%";
+                                    } else {
+                                        document.querySelector(".progress").style.visibility = 'hidden';
+                                    }
+                                }
+                            }
+                        })
+                        .then(( { data: { text } }) => {
+                            document.getElementById("outputText").innerText = text;
+                            console.log(text)
+                        }
+                    )
+                }, false);
+            }
+        }
+    </script>
+    <script src="/static/camera.js"></script>
+</body>
+</html>
