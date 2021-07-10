@@ -10,11 +10,6 @@ def home():
     return render_template('home.html')
 
 
-@app.route('/camera')
-def camera():
-    return render_template('camera.html')
-
-
 if __name__ == "__main__":
     if "DYNO" not in os.environ:
         # Need to run the camera on https
