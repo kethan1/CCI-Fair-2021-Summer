@@ -8,88 +8,61 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OCR Document Scanner</title>
+    <title>Image to Text Processing</title>
     <script src='https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js'></script>
     <script src="/static/glfx.js"></script>
+    <link rel="icon" type="image/png" href="/static/favicon.png"/>
 </head>
 <body>
-    <div class="container" style="text-align: center;">
-        <h3>OCR Document Scanner</h3>
-        <p>Take Image From Camera:</p>
-        <div style="text-align: center;">
-            <video id="video" width="480" height="360" autoplay></video>
-            <br>
-            <br>
-            <button id="snap" class="btn waves-effect waves-light">Crop and Clean Up Image</button>
+    <div class="container" style="text-align: center; max-width: 100%;">
+        <h3>Image to Text Processing</h3>
+        <p>How would you like to scan the image?</p>
+        <label>
+            <input type="radio" id="camera_radio_button_show" name="camera_or_file">
+            <span>Use Camera</span>
+        </label>
+        <label>
+            <input type="radio" id="upload_file_radio_button_show" name="camera_or_file">
+            <span>Upload File</span>
+        </label>
+        
+        <div id="show_camera_section">
+            <div style="text-align: center; display: none;">
+                <video id="video" width="480" height="360" autoplay></video>
+                <br>
+                <br>
+            </div>
         </div>
-        <p>Or Upload File:</p>
-        <div class="row">
-            <div class="file-field input-field">
-                <div class="btn">
-                    <span>File</span>
-                    <input type="file">
-                </div>
-                <div class="file-path-wrapper">
-                    <input class="file-path validate" type="text">
+        <div id="show_file_input_section" style="display: none;">
+            <div class="row">
+                <div class="file-field input-field">
+                    <div class="btn">
+                        <span>File</span>
+                        <input type="file">
+                    </div>
+                    <div class="file-path-wrapper">
+                        <input class="file-path validate" type="text">
+                    </div>
                 </div>
             </div>
-            <!-- <a onclick="getTextFromFile()" class="waves-effect waves-light btn">Get Text From Image</a> -->
         </div>
+        
+        <button id="snap" class="btn waves-effect waves-light">Crop and Clean Up Image</button>
         <br>
-        <div>
-            <div class="progress" style="visibility: hidden;">
+        <br>
+        <div id="changeCanvas"></div>
+        <div id="progress_bars" style="visibility: hidden;">
+            <div class="progress">
                 <div class="determinate" style="width: 0%;"></div>
             </div>
             <p id="current_action"></p>
         </div>
-        
-        <div id="changeCanvas">
-
-        </div>
-        <h4 style="text-align: center;">
+        <h4 style="text-align: center; visibility: hidden;">
             Output Text:
             <div id="outputText"></div>
         </h4>
     </div>
-    
-    <script>
-        function getTextFromFile() {
-            if (document.querySelector('input[type=file]').files.length > 0) {
-                const file = document.querySelector('input[type=file]').files[0];
-                const reader = new FileReader();
 
-                if (file) {
-                    reader.readAsDataURL(file);
-                }
-
-                reader.addEventListener("load", function () {
-
-                    // convert image file to base64 string
-                    Tesseract.recognize(
-                        reader.result,
-                        'eng',
-                        {
-                            logger: m => {
-                                console.log(m)
-                                if (m.status === "recognizing text") {
-                                    if (!(m.progress === 1)) {
-                                        document.querySelector(".progress").style.visibility = 'visible';
-                                        document.querySelector(".determinate").style.width = String(m.progress * 100) + "%";
-                                    } else {
-                                        document.querySelector(".progress").style.visibility = 'hidden';
-                                    }
-                                }
-                            }
-                        })
-                        .then(( { data: { text } }) => {
-                            document.getElementById("outputText").innerText = text;
-                            console.log(text)
-                        }
-                    )
-                }, false);
-            }
-        }
-    </script>
-    <script src="/static/camera.js"></script>
+    <script src="/static/get_text.js"></script>
 </body>
 </html>
